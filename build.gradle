@@ -1,0 +1,67 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.1'
+	id 'io.spring.dependency-management' version '1.1.5'
+	id 'nu.studer.jooq' version '8.2'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	jooqGenerator 'org.postgresql:postgresql'
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jooq {
+	version = '3.19.10'
+	configurations {
+		main {
+			generationTool {
+				logging = 'WARN'
+				jdbc {
+					driver = 'org.postgresql.Driver'
+					url = 'jdbc:postgresql://localhost:5432/postgres'
+					user = 'postgres'
+					password = 'a57sa931'
+				}
+				generator {
+					name = 'org.jooq.codegen.JavaGenerator'
+					database {
+						name = 'org.jooq.meta.postgres.PostgresDatabase'
+						includes = '.*'
+						excludes = '^(Fly|XFly).*'
+						schemata {
+							schema {
+								inputSchema = 'purchase'
+							}
+						}
+					}
+					target {
+						packageName = 'jooqdata'
+						directory = 'src/main/java/jooq'
+					}
+					generate {
+						javaTimeTypes = true
+						records = true
+						relations = true
+						instanceFields = true
+					}
+				}
+			}
+		}
+	}
+}
